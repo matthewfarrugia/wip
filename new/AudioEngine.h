@@ -1,6 +1,5 @@
 //
 //  AudioEngine.h
-//  Gettings things
 //
 //  Created by Matthew Farrugia on 24/02/2018.
 //  Copyright © 2018 Matthew Farrugia. All rights reserved.
@@ -14,14 +13,8 @@
 
 @interface AudioEngine : NSObject
 
-@property AudioDevice * inputAudioDevice;
-@property AudioDevice * outputAudioDevice;
-
-@property AudioBufferList * mWorkBuf;
-@property Float32 * buffer;
-
-- (id) init: (AudioDevice*) inputAudioDevice withOutputDevice: (AudioDevice*) outputAudioDevice;
-- (OSStatus) startEngines;
+- (id)init:(AudioDevice*)inDevice withOutputDevice:(AudioDevice*)outDevice;
+- (OSStatus)startEngines;
 
 @end
 

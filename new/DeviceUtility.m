@@ -1,6 +1,5 @@
 //
-//  deviceUtility.m
-//  getAudio
+//  DeviceUtility.m
 //
 //  Created by Matthew Farrugia on 18/02/2018.
 //  Copyright © 2018 Matthew Farrugia. All rights reserved.
@@ -12,12 +11,16 @@
 
 @implementation DeviceUtility
 
-//Byte mWorkBuf;
+@synthesize defaultInputDeviceID;
+@synthesize defaultOutputDeviceID;
 
-+ (void) initialize {
+- (id)init {
+    [self fetchDefaultInputDeviceID];
+    [self fetchDefaultOutputDeviceID];
+    return self;
 }
 
-+ (void) getDeviceInfo:(AudioDeviceID)deviceID {
+- (void)getDeviceInfo:(AudioDeviceID)deviceID {
     AudioObjectPropertyAddress deviceAddress;
     char    deviceName[64];
     char    manufacturerName[64];
@@ -56,20 +59,8 @@
         }
     }
 }
-OSStatus MyIOProc(AudioDeviceID           inDevice,
-                  const AudioTimeStamp*   inNow,
-                  const AudioBufferList*  inInputData,
-                  const AudioTimeStamp*   inInputTime,
-                  AudioBufferList*        outOutputData,
-                  const AudioTimeStamp*   inOutputTime,
-                  void*                   inClientData)
-{
-    return 0;
-}
 
-
-- (AudioDeviceID)getDefaultOutputDeviceID
-{
+- (void)fetchDefaultOutputDeviceID {
     AudioObjectPropertyAddress getDefaultOutputDevicePropertyAddress = {
         kAudioHardwarePropertyDefaultOutputDevice,
         kAudioObjectPropertyScopeGlobal,
@@ -85,15 +76,14 @@ OSStatus MyIOProc(AudioDeviceID           inDevice,
                                                  &dataSize, &defaultOutputDeviceID);
     if(kAudioHardwareNoError != result)
     {
-        return result;
+
     } else {
-        [DeviceUtility getDeviceInfo:defaultOutputDeviceID];
-        return defaultOutputDeviceID;
+        [self getDeviceInfo:defaultOutputDeviceID];
+        self.defaultOutputDeviceID = defaultOutputDeviceID;
     }
 }
 
-- (AudioDeviceID)getDefaultInputDeviceID
-{
+- (void)fetchDefaultInputDeviceID {
     AudioObjectPropertyAddress getDefaultOutputDevicePropertyAddress = {
         kAudioHardwarePropertyDefaultInputDevice,
         kAudioObjectPropertyScopeGlobal,
@@ -109,16 +99,15 @@ OSStatus MyIOProc(AudioDeviceID           inDevice,
                                                  &dataSize, &defaultInputDeviceID);
     if(kAudioHardwareNoError != result)
     {
-        return result;
+        
     } else {
-        [DeviceUtility getDeviceInfo:defaultInputDeviceID];
-        return defaultInputDeviceID;
+        [self getDeviceInfo:defaultInputDeviceID];
+        self.defaultInputDeviceID = defaultInputDeviceID;
     }
 }
 
-- (Float32) getDefaultOutputDeviceVolume
-{
-    AudioDeviceID defaultOutputDeviceID = [self getDefaultOutputDeviceID];
+- (Float32)getDefaultOutputDeviceVolume {
+    AudioDeviceID defaultOutputDeviceID = self.defaultOutputDeviceID;
     
     AudioObjectPropertyAddress volumePropertyAddress = {
         kAudioDevicePropertyVolumeScalar,
@@ -141,9 +130,8 @@ OSStatus MyIOProc(AudioDeviceID           inDevice,
     }
 }
 
-- (void) setDefaultOutputDeviceVolume:(Float32)newVolume
-{
-    AudioDeviceID defaultOutputDeviceID = [self getDefaultOutputDeviceID];
+- (void)setDefaultOutputDeviceVolume:(Float32)newVolume {
+    AudioDeviceID defaultOutputDeviceID = self.defaultOutputDeviceID;
 
     AudioStreamBasicDescription audioFormat = [self getDefaultStreamDescription];
     UInt32 numOfChannels = audioFormat.mChannelsPerFrame;
@@ -167,9 +155,8 @@ OSStatus MyIOProc(AudioDeviceID           inDevice,
     }
 }
 
-- (AudioStreamBasicDescription) getDefaultStreamDescription
-{
-    AudioDeviceID defaultOutputDeviceID = [self getDefaultOutputDeviceID];
+- (AudioStreamBasicDescription)getDefaultStreamDescription {
+    AudioDeviceID defaultOutputDeviceID = self.defaultOutputDeviceID;
     
     AudioObjectPropertyAddress channelPropertyAddress;
     channelPropertyAddress.mSelector = kAudioDevicePropertyStreamFormat;
@@ -188,8 +175,8 @@ OSStatus MyIOProc(AudioDeviceID           inDevice,
         return format;
     }
 }
-+ (UInt32)getBufferSizes:(AudioDeviceID)outputDeviceID
-{
+
+- (UInt32)getBufferSizes:(AudioDeviceID)outputDeviceID {
     AudioObjectPropertyAddress channelPropertyAddress;
     channelPropertyAddress.mSelector = kAudioDevicePropertyBufferSize;
     channelPropertyAddress.mScope = kAudioDevicePropertyScopeOutput;
@@ -208,96 +195,5 @@ OSStatus MyIOProc(AudioDeviceID           inDevice,
         return bufferSize;
     }
 }
-//- (void)startAudio:(AudioDeviceID)outputDeviceID withInputID:(AudioDeviceID)InputDeviceID
-//{
-//    NSLog(@"WE START");
-//    
-//    AudioObjectPropertyAddress channelPropertyAddress;
-//    channelPropertyAddress.mSelector = kAudioDevicePropertyBufferFrameSize;
-//    channelPropertyAddress.mScope = kAudioDevicePropertyScopeOutput;
-//    channelPropertyAddress.mElement = kAudioObjectPropertyElementMaster;
-//    
-//    UInt32 bufferFrameSize;
-//    UInt32 dataSize = sizeof(bufferFrameSize);
-//    
-//    OSStatus result = AudioObjectGetPropertyData(outputDeviceID, &channelPropertyAddress, 0, NULL, &dataSize, &bufferFrameSize);
-//    
-//    channelPropertyAddress.mSelector = kAudioDevicePropertyStreamFormat;
-//    
-//    AudioStreamBasicDescription format;
-//    dataSize = sizeof(format);
-//    
-//    result = AudioObjectGetPropertyData(outputDeviceID, &channelPropertyAddress, 0, NULL, &dataSize, &format);
-//    
-////
-////    mWorkBuf = bufferFrameSize * format.mBytesPerFrame;
-////    NSLog(@"print");
-////    memset(mWorkBuf, 0, bufferFrameSize * format.mBytesPerFrame);
-//
-//    AudioDeviceIOProc mOutputIOProc = OutputIOProc;
-//    AudioDeviceIOProcID mOutputIOProcID = NULL;
-//    AudioDeviceCreateIOProcID(outputDeviceID, mOutputIOProc, NULL, &mOutputIOProcID);
-//    AudioDeviceStart(outputDeviceID, mOutputIOProcID);
-//    
-//    AudioDeviceIOProc mInputIOProc = InputIOProc;
-//    AudioDeviceIOProcID mInputIOProcID = NULL;
-//    AudioDeviceCreateIOProcID(InputDeviceID, mInputIOProc, NULL, &mInputIOProcID);
-//    AudioDeviceStart(InputDeviceID, mInputIOProcID);
-//    
-//}
-//OSStatus OutputIOProc(AudioDeviceID inDevice, const AudioTimeStamp *inNow, const AudioBufferList *inInputData, const AudioTimeStamp *inInputTime, AudioBufferList *outOutputData, const AudioTimeStamp *inOutputTime, void *inClientData) {
-//    for(UInt32 i=0; i<outOutputData->mNumberBuffers; i++){
-//        UInt32 bytesToCopy = inInputData->mBuffers[i].mDataByteSize;
-//        memcpy(outOutputData->mBuffers[i].mData, inInputData->mBuffers[i].mData, bytesToCopy);
-//    }
-//    return noErr;
-//}
-
-//OSStatus InputIOProc(AudioDeviceID inDevice, const AudioTimeStamp *inNow, const AudioBufferList *inInputData, const AudioTimeStamp *inInputTime, AudioBufferList *outOutputData, const AudioTimeStamp *inOutputTime, void *inClientData) {
-////    for(UInt32 i=0; i<outOutputData->mNumberBuffers; i++){
-////        UInt32 bytesToCopy = inInputData->mBuffers[i].mDataByteSize;
-////        memcpy(outOutputData->mBuffers[i].mData, inInputData->mBuffers[i].mData, bytesToCopy);
-////    }
-//    return noErr;
-//}
-
-//AudioTee::AudioTee(AudioDeviceID inputDeviceID, AudioDeviceID outputDeviceID) : mInputDevice(inputDeviceID, true), mOutputDevice(outputDeviceID, false), mSecondsInHistoryBuffer(20), mWorkBuf(NULL), mHistBuf(), mHistoryBufferMaxByteSize(0), mBufferSize(1024), mHistoryBufferByteSize(0), mHistoryBufferHeadOffsetFrameNumber(0) {
-//    mInputDevice.SetBufferSize(mBufferSize);
-//    mOutputDevice.SetBufferSize(mBufferSize);
-//}
-//
-//void AudioTee::start() {
-//    if (mInputDevice.mID == kAudioDeviceUnknown || mOutputDevice.mID == kAudioDeviceUnknown) return;
-//    if (mInputDevice.mFormat.mSampleRate != mOutputDevice.mFormat.mSampleRate) {
-//        printf("Error in AudioTee::Start() - sample rate mismatch: %f / %f\n", mInputDevice.mFormat.mSampleRate, mOutputDevice.mFormat.mSampleRate);
-//        return;
-//    }
-//    mWorkBuf = new Byte[mInputDevice.mBufferSizeFrames * mInputDevice.mFormat.mBytesPerFrame];
-//    memset(mWorkBuf, 0, mInputDevice.mBufferSizeFrames * mInputDevice.mFormat.mBytesPerFrame);
-//    UInt32 framesInHistoryBuffer = NextPowerOfTwo(mInputDevice.mFormat.mSampleRate * mSecondsInHistoryBuffer);
-//    mHistoryBufferMaxByteSize = mInputDevice.mFormat.mBytesPerFrame * framesInHistoryBuffer;
-//    mHistBuf = new CARingBuffer();
-//    mHistBuf->Allocate(2, mInputDevice.mFormat.mBytesPerFrame, framesInHistoryBuffer);
-//    printf("Initializing history buffer with byte capacity %u — %f seconds at %f kHz", mHistoryBufferMaxByteSize, (mHistoryBufferMaxByteSize / mInputDevice.mFormat.mSampleRate / (4 * 2)), mInputDevice.mFormat.mSampleRate);
-//    printf("Initializing work buffer with mBufferSizeFrames:%u and mBytesPerFrame %u\n", mInputDevice.mBufferSizeFrames, mInputDevice.mFormat.mBytesPerFrame);
-//    mInputIOProcID = NULL;
-//    AudioDeviceCreateIOProcID(mInputDevice.mID, InputIOProc, this, &mInputIOProcID);
-//    AudioDeviceStart(mInputDevice.mID, mInputIOProcID);
-//    mOutputIOProc = OutputIOProc;
-//    mOutputIOProcID = NULL;
-//    AudioDeviceCreateIOProcID(mOutputDevice.mID, mOutputIOProc, this, &mOutputIOProcID);
-//    AudioDeviceStart(mOutputDevice.mID, mOutputIOProcID);
-//}
-//
-//void AudioTee::stop() {
-//    AudioDeviceStop(mInputDevice.mID, mInputIOProcID);
-//    AudioDeviceDestroyIOProcID(mInputDevice.mID, mInputIOProcID);
-//    AudioDeviceStop(mOutputDevice.mID, mOutputIOProcID);
-//    AudioDeviceDestroyIOProcID(mOutputDevice.mID, mOutputIOProcID);
-//    if (mWorkBuf) {
-//        delete[] mWorkBuf;
-//        mWorkBuf = NULL;
-//    }
-//}
 
 @end

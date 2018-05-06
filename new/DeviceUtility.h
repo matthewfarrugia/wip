@@ -1,6 +1,5 @@
 //
-//  getDevice.h
-//  getAudio
+//  GetDevice.h
 //
 //  Created by Matthew Farrugia on 18/02/2018.
 //  Copyright © 2018 Matthew Farrugia. All rights reserved.
@@ -13,14 +12,14 @@
 
 @interface DeviceUtility : NSObject
 
-+ (void)getDeviceInfo:(AudioDeviceID)deviceID;
+@property AudioDeviceID defaultInputDeviceID;
+@property AudioDeviceID defaultOutputDeviceID;
+
+- (void)getDeviceInfo:(AudioDeviceID)deviceID;
 - (AudioStreamBasicDescription)getDefaultStreamDescription;
-- (AudioDeviceID)getDefaultOutputDeviceID;
 - (Float32)getDefaultOutputDeviceVolume;
 - (void)setDefaultOutputDeviceVolume:(Float32)newVolume;
-+ (UInt32)getBufferSizes:(AudioDeviceID)outputDeviceID;
-//- (void)startAudio:(AudioDeviceID)outputDeviceID withInputID:(AudioDeviceID)InputDeviceID;
-- (AudioDeviceID)getDefaultInputDeviceID;
+- (UInt32)getBufferSizes:(AudioDeviceID)outputDeviceID;
 
 @end
 

@@ -1,6 +1,5 @@
 //
-//  audioDevice.m
-//  Gettings things
+//  AudioDevice.m
 //
 //  Created by Matthew Farrugia on 18/02/2018.
 //  Copyright © 2018 Matthew Farrugia. All rights reserved.
@@ -12,24 +11,25 @@
 
 @implementation AudioDevice
 
-@synthesize deviceID = _deviceID;
-@synthesize isInput = _isInput;
-@synthesize safteyOffset = _safteyOffset;
-@synthesize bufferFrameSize = _bufferFrameSize;
-@synthesize streamFormat = _streamFormat;
+@synthesize deviceID;
+@synthesize isInput;
+@synthesize safteyOffset;
+@synthesize bufferFrameSize;
+@synthesize streamFormat;
+
 char deviceName[64];
 
-- (id) initWithDeviceID:(AudioDeviceID)deviceID withIsInput:(BOOL)isInput {
+- (id)initWithDeviceID:(AudioDeviceID)inDeviceID withIsInput:(BOOL)inIsInput {
     
-    _deviceID = deviceID;
-    _isInput = isInput;
+    deviceID = inDeviceID;
+    isInput = inIsInput;
     
     //******* Device Name
     AudioObjectPropertyAddress propertyAddress;
     propertyAddress.mSelector = kAudioDevicePropertyDeviceName;
     propertyAddress.mElement = kAudioObjectPropertyElementMaster;
     
-    if (_isInput){
+    if (isInput){
         propertyAddress.mScope = kAudioDevicePropertyScopeInput;
     } else {
         propertyAddress.mScope = kAudioDevicePropertyScopeOutput;
@@ -37,7 +37,7 @@ char deviceName[64];
     
     UInt32 dataSize = sizeof(deviceName);
 
-    OSStatus result = AudioObjectGetPropertyData(_deviceID, &propertyAddress, 0, NULL, &dataSize, &deviceName);
+    OSStatus result = AudioObjectGetPropertyData(deviceID, &propertyAddress, 0, NULL, &dataSize, &deviceName);
     
     if (result == kAudioHardwareNoError){
         NSLog(@"Initialising Device: %s", deviceName);
@@ -48,12 +48,12 @@ char deviceName[64];
     //******* Safety Offset
     propertyAddress.mSelector = kAudioDevicePropertySafetyOffset;
 
-    dataSize = sizeof(_safteyOffset);
+    dataSize = sizeof(safteyOffset);
     
-    result = AudioObjectGetPropertyData(_deviceID, &propertyAddress, 0, NULL, &dataSize, &_safteyOffset);
+    result = AudioObjectGetPropertyData(deviceID, &propertyAddress, 0, NULL, &dataSize, &safteyOffset);
     
     if (result == kAudioHardwareNoError){
-        NSLog(@"    Saftey Offset: %i", _safteyOffset);
+        NSLog(@"    Saftey Offset: %i", safteyOffset);
     } else {
         NSLog(@"ERROR: %i", result);
     }
@@ -61,12 +61,12 @@ char deviceName[64];
     //******* Buffer Frame Size
     propertyAddress.mSelector = kAudioDevicePropertyBufferFrameSize;
     
-    dataSize = sizeof(_bufferFrameSize);
+    dataSize = sizeof(bufferFrameSize);
     
-    result = AudioObjectGetPropertyData(_deviceID, &propertyAddress, 0, NULL, &dataSize, &_bufferFrameSize);
+    result = AudioObjectGetPropertyData(deviceID, &propertyAddress, 0, NULL, &dataSize, &bufferFrameSize);
     
     if (result == kAudioHardwareNoError){
-        NSLog(@"    Buffer Frame Size: %i", _bufferFrameSize);
+        NSLog(@"    Buffer Frame Size: %i", bufferFrameSize);
     } else {
         NSLog(@"ERROR: %i", result);
     }
@@ -76,25 +76,25 @@ char deviceName[64];
     return self;
 }
 
-- (void) updateFormat {
+- (void)updateFormat {
     
     AudioObjectPropertyAddress propertyAddress;
     propertyAddress.mSelector = kAudioDevicePropertyStreamFormat;
     propertyAddress.mElement = kAudioObjectPropertyElementMaster;
     
-    if (_isInput){
+    if (isInput){
         propertyAddress.mScope = kAudioDevicePropertyScopeInput;
     } else {
         propertyAddress.mScope = kAudioDevicePropertyScopeOutput;
     }
     
-    UInt32 dataSize = sizeof(_streamFormat);
+    UInt32 dataSize = sizeof(streamFormat);
     
-    OSStatus result = AudioObjectGetPropertyData(_deviceID, &propertyAddress, 0, NULL, &dataSize, &_streamFormat);
+    OSStatus result = AudioObjectGetPropertyData(deviceID, &propertyAddress, 0, NULL, &dataSize, &streamFormat);
     
     if (result == kAudioHardwareNoError) {
-        NSLog(@"    Number of Channels: %i", _streamFormat.mChannelsPerFrame);
-        NSLog(@"    Sample Rate: %f", _streamFormat.mSampleRate);
+        NSLog(@"    Number of Channels: %i", streamFormat.mChannelsPerFrame);
+        NSLog(@"    Sample Rate: %f", streamFormat.mSampleRate);
     } else {
         NSLog(@"ERROR receiving stream format: %i", result);
     }

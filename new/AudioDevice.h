@@ -1,6 +1,5 @@
 //
 //  AudioDevice.h
-//  Gettings things
 //
 //  Created by Matthew Farrugia on 18/02/2018.
 //  Copyright © 2018 Matthew Farrugia. All rights reserved.
@@ -19,8 +18,8 @@
 @property UInt32 bufferFrameSize;
 @property AudioStreamBasicDescription streamFormat;
 
-- (id) initWithDeviceID:(AudioDeviceID)deviceID withIsInput:(BOOL)isInput;
-- (void) updateFormat;
+- (id)initWithDeviceID:(AudioDeviceID)deviceID withIsInput:(BOOL)isInput;
+- (void)updateFormat;
 
 @end
 #endif /* AudioDevice_h */

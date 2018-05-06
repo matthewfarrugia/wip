@@ -1,6 +1,5 @@
 //
 //  AudioEngine.m
-//  Gettings things
 //
 //  Created by Matthew Farrugia on 24/02/2018.
 //  Copyright © 2018 Matthew Farrugia. All rights reserved.
@@ -11,9 +10,10 @@
 
 @implementation AudioEngine
 
-@synthesize inputAudioDevice = _inputAudioDevice;
-@synthesize outputAudioDevice = _outputAudioDevice;
-@synthesize mWorkBuf = _mWorkBuf;
+AudioDevice * inputAudioDevice;
+AudioDevice * outputAudioDevice;
+
+AudioBufferList * mWorkBuf;
 
 AudioDeviceIOProc mInputIOProc;
 AudioDeviceIOProcID mInputIOProcID;
@@ -21,38 +21,38 @@ AudioDeviceIOProc mOutputIOProc;
 AudioDeviceIOProcID mOutputIOProcID;
 
 
-- (id) init: (AudioDevice*) inputAudioDevice withOutputDevice: (AudioDevice*) outputAudioDevice {
-    _inputAudioDevice = inputAudioDevice;
-    _outputAudioDevice = outputAudioDevice;
+- (id)init:(AudioDevice*)inDevice withOutputDevice:(AudioDevice*)outDevice {
+    inputAudioDevice = inDevice;
+    outputAudioDevice = outDevice;
     return self;
 }
 
-- (OSStatus) startEngines {
+- (OSStatus)startEngines {
     
-    AudioDeviceID inputDeviceID = _inputAudioDevice.deviceID;
-    AudioDeviceID outputDeviceID = _outputAudioDevice.deviceID;
+    AudioDeviceID inputDeviceID = inputAudioDevice.deviceID;
+    AudioDeviceID outputDeviceID = outputAudioDevice.deviceID;
 
     OSStatus result;
     
-    UInt32 bitsPerChannel = _inputAudioDevice.streamFormat.mBitsPerChannel;
-    UInt32 bytesPerFrame = _inputAudioDevice.streamFormat.mBytesPerFrame;
-    UInt32 bytesPerPacket = _inputAudioDevice.streamFormat.mBytesPerPacket;
-    UInt32 channelsPerFrame = _inputAudioDevice.streamFormat.mChannelsPerFrame;
-    UInt32 framesPerPacket = _inputAudioDevice.streamFormat.mFramesPerPacket;
+    UInt32 bitsPerChannel = inputAudioDevice.streamFormat.mBitsPerChannel;
+    UInt32 bytesPerFrame = inputAudioDevice.streamFormat.mBytesPerFrame;
+    UInt32 bytesPerPacket = inputAudioDevice.streamFormat.mBytesPerPacket;
+    UInt32 channelsPerFrame = inputAudioDevice.streamFormat.mChannelsPerFrame;
+    UInt32 framesPerPacket = inputAudioDevice.streamFormat.mFramesPerPacket;
     
     AudioBufferList buffer;
     
-    _mWorkBuf = malloc(sizeof(buffer));
+    mWorkBuf = malloc(sizeof(buffer));
     
-    _mWorkBuf->mBuffers->mDataByteSize = (bitsPerChannel * bytesPerFrame * bytesPerPacket * channelsPerFrame * framesPerPacket);
-    _mWorkBuf->mBuffers->mNumberChannels = channelsPerFrame;
-    _mWorkBuf->mBuffers[0].mData = malloc(_mWorkBuf->mBuffers[0].mDataByteSize);
+    mWorkBuf->mBuffers->mDataByteSize = (bitsPerChannel * bytesPerFrame * bytesPerPacket * channelsPerFrame * framesPerPacket);
+    mWorkBuf->mBuffers->mNumberChannels = channelsPerFrame;
+    mWorkBuf->mBuffers[0].mData = malloc(mWorkBuf->mBuffers[0].mDataByteSize);
 
     //******* Input Proc
     mInputIOProc = InputIOProc;
     mInputIOProcID = NULL;
     
-    result = AudioDeviceCreateIOProcID(inputDeviceID, mInputIOProc, _mWorkBuf, &mInputIOProcID);
+    result = AudioDeviceCreateIOProcID(inputDeviceID, mInputIOProc, mWorkBuf, &mInputIOProcID);
     
     if (result == kAudioHardwareNoError){
         NSLog(@"|Input Proc started|");
@@ -74,7 +74,7 @@ AudioDeviceIOProcID mOutputIOProcID;
     mOutputIOProc = OutputIOProc;
     mOutputIOProcID = NULL;
     
-    result = AudioDeviceCreateIOProcID(outputDeviceID, mOutputIOProc, _mWorkBuf, &mOutputIOProcID);
+    result = AudioDeviceCreateIOProcID(outputDeviceID, mOutputIOProc, mWorkBuf, &mOutputIOProcID);
     
     if (result == kAudioHardwareNoError){
         NSLog(@"|Output Proc started|");
@@ -95,10 +95,10 @@ AudioDeviceIOProcID mOutputIOProcID;
     return kAudioHardwareNoError;
 }
 
-- (OSStatus) stopEngines {
+- (OSStatus)stopEngines {
     
-    AudioDeviceID inputDeviceID = _inputAudioDevice.deviceID;
-    AudioDeviceID outputDeviceID = _outputAudioDevice.deviceID;
+    AudioDeviceID inputDeviceID = inputAudioDevice.deviceID;
+    AudioDeviceID outputDeviceID = outputAudioDevice.deviceID;
     
     OSStatus result;
 

@@ -1,6 +1,5 @@
 //
 //  AppDelegate.m
-//  new
 //
 //  Created by Matthew Farrugia on 18/02/2018.
 //  Copyright © 2018 Matthew Farrugia. All rights reserved.
@@ -19,8 +18,8 @@
 
     DeviceUtility * audioDevicesUtility = [[DeviceUtility alloc] init];
     //Float32 currentOutputVol = [audioDevicesUtility getDefaultOutputDeviceVolume];
-    AudioDeviceID audioOutputDeviceID = [audioDevicesUtility getDefaultOutputDeviceID];
-    AudioDeviceID audioInputDeviceID = [audioDevicesUtility getDefaultInputDeviceID];
+    AudioDeviceID audioOutputDeviceID = audioDevicesUtility.defaultOutputDeviceID;
+    AudioDeviceID audioInputDeviceID = audioDevicesUtility.defaultInputDeviceID;
     
     AudioDevice * inputDevice = [[AudioDevice alloc] initWithDeviceID:audioInputDeviceID withIsInput:TRUE];
     AudioDevice * outputDevice = [[AudioDevice alloc] initWithDeviceID:audioOutputDeviceID withIsInput:FALSE];

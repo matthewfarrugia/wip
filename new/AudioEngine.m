@@ -6,12 +6,19 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "Logger.h"
 #import "AudioEngine.h"
 
 @implementation AudioEngine
 
 AudioDevice * inputAudioDevice;
 AudioDevice * outputAudioDevice;
+
+UInt32 bitsPerChannel;
+UInt32 bytesPerFrame;
+UInt32 bytesPerPacket;
+UInt32 channelsPerFrame;
+UInt32 framesPerPacket;
 
 AudioBufferList * mWorkBuf;
 
@@ -22,23 +29,20 @@ AudioDeviceIOProcID mOutputIOProcID;
 
 
 - (id)init:(AudioDevice*)inDevice withOutputDevice:(AudioDevice*)outDevice {
+    
     inputAudioDevice = inDevice;
     outputAudioDevice = outDevice;
+    
+    bitsPerChannel = inputAudioDevice.streamFormat.mBitsPerChannel;
+    bytesPerFrame = inputAudioDevice.streamFormat.mBytesPerFrame;
+    bytesPerPacket = inputAudioDevice.streamFormat.mBytesPerPacket;
+    channelsPerFrame = inputAudioDevice.streamFormat.mChannelsPerFrame;
+    framesPerPacket = inputAudioDevice.streamFormat.mFramesPerPacket;
+    
     return self;
 }
 
 - (OSStatus)startEngines {
-    
-    AudioDeviceID inputDeviceID = inputAudioDevice.deviceID;
-    AudioDeviceID outputDeviceID = outputAudioDevice.deviceID;
-
-    OSStatus result;
-    
-    UInt32 bitsPerChannel = inputAudioDevice.streamFormat.mBitsPerChannel;
-    UInt32 bytesPerFrame = inputAudioDevice.streamFormat.mBytesPerFrame;
-    UInt32 bytesPerPacket = inputAudioDevice.streamFormat.mBytesPerPacket;
-    UInt32 channelsPerFrame = inputAudioDevice.streamFormat.mChannelsPerFrame;
-    UInt32 framesPerPacket = inputAudioDevice.streamFormat.mFramesPerPacket;
     
     AudioBufferList buffer;
     
@@ -48,96 +52,89 @@ AudioDeviceIOProcID mOutputIOProcID;
     mWorkBuf->mBuffers->mNumberChannels = channelsPerFrame;
     mWorkBuf->mBuffers[0].mData = malloc(mWorkBuf->mBuffers[0].mDataByteSize);
 
-    //******* Input Proc
+    //******* Input Proc *******//
     mInputIOProc = InputIOProc;
     mInputIOProcID = NULL;
+    OSStatus result = AudioDeviceCreateIOProcID(inputAudioDevice.deviceID, mInputIOProc, mWorkBuf, &mInputIOProcID);
     
-    result = AudioDeviceCreateIOProcID(inputDeviceID, mInputIOProc, mWorkBuf, &mInputIOProcID);
-    
-    if (result == kAudioHardwareNoError){
-        NSLog(@"|Input Proc started|");
-    } else {
-        NSLog(@"ERROR starting Input Proc: %i", result);
+    if (result != kAudioHardwareNoError){
+        [Logger logAudioFailure:@"Starting input Proc" withCode:&result];
         return result;
+    } else {
+        [Logger logAudioSuccess:@"|Input Proc started|"];
     }
     
-    result = AudioDeviceStart(inputDeviceID, mInputIOProcID);
-
-    if (result == kAudioHardwareNoError){
-        NSLog(@"|Input device started|");
-    } else {
-        NSLog(@"ERROR starting Input device: %i", result);
+    result = AudioDeviceStart(inputAudioDevice.deviceID, mInputIOProcID);
+    
+    if (result != kAudioHardwareNoError){
+        [Logger logAudioFailure:@"Starting input device" withCode:&result];
         return result;
+    } else {
+        [Logger logAudioSuccess:@"|Input device started|"];
     }
     
-    //******* Output Proc
+    //******* Output Proc *******//
     mOutputIOProc = OutputIOProc;
     mOutputIOProcID = NULL;
+    result = AudioDeviceCreateIOProcID(outputAudioDevice.deviceID, mOutputIOProc, mWorkBuf, &mOutputIOProcID);
     
-    result = AudioDeviceCreateIOProcID(outputDeviceID, mOutputIOProc, mWorkBuf, &mOutputIOProcID);
-    
-    if (result == kAudioHardwareNoError){
-        NSLog(@"|Output Proc started|");
-    } else {
-        NSLog(@"ERROR starting Output Proc: %i", result);
+    if (result != kAudioHardwareNoError){
+        [Logger logAudioFailure:@"Starting output Proc" withCode:&result];
         return result;
+    } else {
+        [Logger logAudioSuccess:@"|Output Proc started|"];
     }
     
-    result = AudioDeviceStart(outputDeviceID, mOutputIOProcID);
+    result = AudioDeviceStart(outputAudioDevice.deviceID, mOutputIOProcID);
     
-    if (result == kAudioHardwareNoError){
-        NSLog(@"|Output device started|");
-    } else {
-        NSLog(@"ERROR starting Output device: %i", result);
+    if (result != kAudioHardwareNoError){
+        [Logger logAudioFailure:@"Starting output device" withCode:&result];
         return result;
+    } else {
+        [Logger logAudioSuccess:@"|Output device started|"];
     }
     
     return kAudioHardwareNoError;
 }
 
 - (OSStatus)stopEngines {
-    
-    AudioDeviceID inputDeviceID = inputAudioDevice.deviceID;
-    AudioDeviceID outputDeviceID = outputAudioDevice.deviceID;
-    
-    OSStatus result;
 
-    //******* Stop Input Proc
-    result = AudioDeviceStop(inputDeviceID, mInputIOProcID);
+    //******* Stop Input Proc  *******//
+    OSStatus result = AudioDeviceStop(inputAudioDevice.deviceID, mInputIOProcID);
     
-    if (result == kAudioHardwareNoError){
-        NSLog(@"|Input device stopped|");
-    } else {
-        NSLog(@"ERROR stopping Input device: %i", result);
+    if (result != kAudioHardwareNoError){
+        [Logger logAudioFailure:@"Stopping input device" withCode:&result];
         return result;
+    } else {
+        [Logger logAudioSuccess:@"|Input device stopped|"];
     }
     
-    result = AudioDeviceDestroyIOProcID(inputDeviceID, mInputIOProcID);
+    result = AudioDeviceDestroyIOProcID(inputAudioDevice.deviceID, mInputIOProcID);
     
-    if (result == kAudioHardwareNoError){
-        NSLog(@"|Input device destroyed|");
-    } else {
-        NSLog(@"ERROR destorying Input device: %i", result);
+    if (result != kAudioHardwareNoError){
+        [Logger logAudioFailure:@"Destorying input device" withCode:&result];
         return result;
+    } else {
+        [Logger logAudioSuccess:@"|Input device destroyed|"];
     }
     
     //******* Stop Output Proc
-    result = AudioDeviceStop(outputDeviceID, mOutputIOProcID);
+    result = AudioDeviceStop(outputAudioDevice.deviceID, mOutputIOProcID);
     
-    if (result == kAudioHardwareNoError){
-        NSLog(@"|Output device stopped|");
-    } else {
-        NSLog(@"ERROR stopping Output device: %i", result);
+    if (result != kAudioHardwareNoError){
+        [Logger logAudioFailure:@"Stopping output device" withCode:&result];
         return result;
+    } else {
+        [Logger logAudioSuccess:@"|Output device stopped|"];
     }
     
-    result = AudioDeviceDestroyIOProcID(outputDeviceID, mOutputIOProcID);
+    result = AudioDeviceDestroyIOProcID(outputAudioDevice.deviceID, mOutputIOProcID);
     
-    if (result == kAudioHardwareNoError){
-        NSLog(@"|Output device destroyed|");
-    } else {
-        NSLog(@"ERROR destorying Output device: %i", result);
+    if (result != kAudioHardwareNoError){
+        [Logger logAudioFailure:@"Destorying output device" withCode:&result];
         return result;
+    } else {
+        [Logger logAudioSuccess:@"|Output device destroyed|"];
     }
     
     return kAudioHardwareNoError;

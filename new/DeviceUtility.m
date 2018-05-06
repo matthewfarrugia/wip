@@ -7,6 +7,7 @@
 
 #import <Foundation/Foundation.h>
 #import <CoreAudio/CoreAudio.h>
+#import "Logger.h"
 #import "DeviceUtility.h"
 
 @implementation DeviceUtility
@@ -15,95 +16,168 @@
 @synthesize defaultOutputDeviceID;
 
 - (id)init {
-    [self fetchDefaultInputDeviceID];
-    [self fetchDefaultOutputDeviceID];
+    [self fetchDefaultDeviceID:TRUE];
+    [self fetchDefaultDeviceID:FALSE];
     return self;
 }
 
-- (void)getDeviceInfo:(AudioDeviceID)deviceID {
-    AudioObjectPropertyAddress deviceAddress;
+- (void)logDeviceInfo:(AudioDeviceID)deviceID {
+    
     char    deviceName[64];
     char    manufacturerName[64];
-    
     UInt32 dataSize = sizeof(deviceName);
-    deviceAddress.mSelector = kAudioDevicePropertyDeviceName;
-    deviceAddress.mScope = kAudioObjectPropertyScopeGlobal;
-    deviceAddress.mElement = kAudioObjectPropertyElementMaster;
+    
+    AudioObjectPropertyAddress deviceAddress = {
+        kAudioDevicePropertyDeviceName,
+        kAudioObjectPropertyScopeGlobal,
+        kAudioObjectPropertyElementMaster
+    };
     
     if (AudioObjectGetPropertyData(deviceID, &deviceAddress, 0, NULL, &dataSize, deviceName) == noErr) {
+        
         dataSize = sizeof(manufacturerName);
         deviceAddress.mSelector = kAudioDevicePropertyDeviceManufacturer;
         
         if (AudioObjectGetPropertyData(deviceID, &deviceAddress, 0, NULL, &dataSize, manufacturerName) == noErr) {
-            CFStringRef uidString;
             
+            CFStringRef uidString;
             dataSize = sizeof(uidString);
             deviceAddress.mSelector = kAudioDevicePropertyDeviceUID;
 
             if (AudioObjectGetPropertyData(deviceID, &deviceAddress, 0, NULL, &dataSize, &uidString) == noErr) {
-                NSLog(@"Output Device: %s by %s id: %@", deviceName, manufacturerName, uidString);
+                
+                [Logger logString:[NSString stringWithFormat:@"Device: %s by %s id: %@", deviceName, manufacturerName, uidString]];
+                 
                 CFRelease(uidString);
-//              OSStatus theError = AudioDeviceCreateIOProcID(deviceIDs[number], MyIOProc, NULL, &theIOProcID);
-//                    //  start IO
-//                    theError = AudioDeviceStart(deviceIDs[number], theIOProcID);
-//
-//                    Float32 output = NewGetVolumeScalar(deviceIDs[number], FALSE, 0);
-//
-//                    NSLog(@"%f", output);
-//                    //  stop IO
-//                    theError = AudioDeviceStop(deviceIDs[number], theIOProcID);
-//
-//                    //  unregister the IOProc
-//                    theError = AudioDeviceDestroyIOProcID(deviceIDs[number], theIOProcID);
+
             }
         }
     }
 }
 
-- (void)fetchDefaultOutputDeviceID {
-    AudioObjectPropertyAddress getDefaultOutputDevicePropertyAddress = {
-        kAudioHardwarePropertyDefaultOutputDevice,
+- (void)fetchDefaultDeviceID:(BOOL)isInput {
+    
+    AudioObjectPropertyAddress defaultDevicePropertyAddress = {
+        isInput ? kAudioHardwarePropertyDefaultInputDevice : kAudioHardwarePropertyDefaultOutputDevice,
         kAudioObjectPropertyScopeGlobal,
         kAudioObjectPropertyElementMaster
     };
     
-    AudioDeviceID defaultOutputDeviceID;
-    UInt32 dataSize = sizeof(defaultOutputDeviceID);
+    AudioDeviceID defaultDeviceID;
+    UInt32 dataSize = sizeof(defaultDeviceID);
 
     OSStatus result = AudioObjectGetPropertyData(kAudioObjectSystemObject,
-                                                 &getDefaultOutputDevicePropertyAddress,
+                                                 &defaultDevicePropertyAddress,
                                                  0, NULL,
-                                                 &dataSize, &defaultOutputDeviceID);
-    if(kAudioHardwareNoError != result)
-    {
-
+                                                 &dataSize, &defaultDeviceID);
+    
+    if (result != kAudioHardwareNoError) {
+        [Logger logAudioFailure:@"Fetching Audio Device ID" withCode: &result];
     } else {
-        [self getDeviceInfo:defaultOutputDeviceID];
-        self.defaultOutputDeviceID = defaultOutputDeviceID;
+        [self logDeviceInfo:defaultDeviceID];
+        if (isInput) {
+            self.defaultInputDeviceID = defaultDeviceID;
+        } else {
+            self.defaultOutputDeviceID = defaultDeviceID;
+        }
     }
 }
 
-- (void)fetchDefaultInputDeviceID {
-    AudioObjectPropertyAddress getDefaultOutputDevicePropertyAddress = {
-        kAudioHardwarePropertyDefaultInputDevice,
-        kAudioObjectPropertyScopeGlobal,
++ (NSString*)getDeviceName:(AudioDeviceID)deviceID withInput:(BOOL)isInput {
+    
+    char deviceName[64];
+    
+    AudioObjectPropertyAddress propertyAddress = {
+        kAudioDevicePropertyDeviceName,
+        isInput ? kAudioDevicePropertyScopeInput : kAudioDevicePropertyScopeOutput,
         kAudioObjectPropertyElementMaster
     };
     
-    AudioDeviceID defaultInputDeviceID;
-    UInt32 dataSize = sizeof(defaultInputDeviceID);
+    UInt32 dataSize = sizeof(deviceName);
+    OSStatus result = AudioObjectGetPropertyData(deviceID, &propertyAddress, 0, NULL, &dataSize, &deviceName);
     
-    OSStatus result = AudioObjectGetPropertyData(kAudioObjectSystemObject,
-                                                 &getDefaultOutputDevicePropertyAddress,
-                                                 0, NULL,
-                                                 &dataSize, &defaultInputDeviceID);
-    if(kAudioHardwareNoError != result)
-    {
-        
+    if (result != kAudioHardwareNoError) {
+        [Logger logAudioFailure:@"Getting Device Name" withCode:&result];
     } else {
-        [self getDeviceInfo:defaultInputDeviceID];
-        self.defaultInputDeviceID = defaultInputDeviceID;
+        [Logger logString:[NSString stringWithFormat:@"%s", deviceName]];
     }
+    
+    return [NSString stringWithFormat:@"%s", deviceName];
+}
+
++ (UInt32)getSafteyOffset:(AudioDeviceID)deviceID withInput:(BOOL)isInput {
+
+    UInt32 safteyOffset;
+    
+    AudioObjectPropertyAddress propertyAddress = {
+        kAudioDevicePropertySafetyOffset,
+        isInput ? kAudioDevicePropertyScopeInput : kAudioDevicePropertyScopeOutput,
+        kAudioObjectPropertyElementMaster
+    };
+    
+    UInt32 dataSize = sizeof(safteyOffset);
+    OSStatus result = AudioObjectGetPropertyData(deviceID,
+                                                 &propertyAddress,
+                                                 0, NULL,
+                                                 &dataSize,
+                                                 &safteyOffset);
+    
+    if (result != kAudioHardwareNoError) {
+        [Logger logAudioFailure:@"Getting Saftey Offset" withCode:&result];
+    } else {
+        [Logger logString:[NSString stringWithFormat:@"    Saftey Offset: %i", safteyOffset]];
+    }
+    
+    return safteyOffset;
+}
+
++ (UInt32)getBufferFrameSize:(AudioDeviceID)deviceID withInput:(BOOL)isInput {
+    
+    UInt32 bufferFrameSize;
+    
+    AudioObjectPropertyAddress propertyAddress = {
+        kAudioDevicePropertyBufferFrameSize,
+        isInput ? kAudioDevicePropertyScopeInput : kAudioDevicePropertyScopeOutput,
+        kAudioObjectPropertyElementMaster
+    };
+    
+    UInt32 dataSize = sizeof(bufferFrameSize);
+    OSStatus result = AudioObjectGetPropertyData(deviceID, &propertyAddress, 0, NULL, &dataSize, &bufferFrameSize);
+    
+    if (result != kAudioHardwareNoError) {
+        [Logger logAudioFailure:@"Getting Buffer Frame Size" withCode:&result];
+    } else {
+        [Logger logString:[NSString stringWithFormat:@"    Buffer Frame Size: %i", bufferFrameSize]];
+    }
+    
+    return bufferFrameSize;
+}
+
++ (AudioStreamBasicDescription)getStreamFormat:(AudioDeviceID)deviceID withInput:(BOOL)isInput {
+    
+    AudioStreamBasicDescription streamFormat;
+    
+    AudioObjectPropertyAddress propertyAddress = {
+        kAudioDevicePropertyStreamFormat,
+        isInput ? kAudioDevicePropertyScopeInput : kAudioDevicePropertyScopeOutput,
+        kAudioObjectPropertyElementMaster
+    };
+    
+    UInt32 dataSize = sizeof(streamFormat);
+    OSStatus result = AudioObjectGetPropertyData(deviceID,
+                                                 &propertyAddress,
+                                                 0, NULL,
+                                                 &dataSize,
+                                                 &streamFormat);
+    
+    if (result != kAudioHardwareNoError) {
+        [Logger logAudioFailure:@"Getting Stream Format" withCode:&result];
+    } else {
+        [Logger logString:[NSString stringWithFormat:@"    Number of Channels: %i", streamFormat.mChannelsPerFrame]];
+        [Logger logString:[NSString stringWithFormat:@"    Sample Rate: %f", streamFormat.mSampleRate]];
+    }
+    
+    return streamFormat;
 }
 
 - (Float32)getDefaultOutputDeviceVolume {
@@ -143,14 +217,13 @@
     volumePropertyAddress.mSelector = kAudioDevicePropertyVolumeScalar;
     volumePropertyAddress.mScope = kAudioDevicePropertyScopeOutput;
     
-    for(int i = 1; i<=numOfChannels; i++)
-    {
+    for (int i = 1; i<=numOfChannels; i++) {
         volumePropertyAddress.mElement = i;
 
         OSStatus result = AudioObjectSetPropertyData(defaultOutputDeviceID, &volumePropertyAddress, 0, NULL, dataSize, &volume);
 
         if (result != kAudioHardwareNoError) {
-            NSLog(@"%i", result);
+            [Logger logAudioFailure:@"Setting Default Device Volume" withCode:&result];
         }
     }
 }
@@ -169,7 +242,7 @@
     OSStatus result = AudioObjectGetPropertyData(defaultOutputDeviceID, &channelPropertyAddress, 0, NULL, &dataSize, &format);
     
     if (result != kAudioHardwareNoError) {
-        NSLog(@"%i", result);
+        [Logger logAudioFailure:@"Getting Default Stream Description" withCode:&result];
         return format;
     } else {
         return format;
@@ -188,7 +261,7 @@
     OSStatus result = AudioObjectGetPropertyData(outputDeviceID, &channelPropertyAddress, 0, NULL, &dataSize, &bufferSize);
     
     if (result != kAudioHardwareNoError) {
-        NSLog(@"%i", result);
+        [Logger logAudioFailure:@"Getting Output Device ID" withCode:&result];
         return 0;
     } else {
         NSLog(@"%i", bufferSize);

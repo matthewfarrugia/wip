@@ -15,11 +15,15 @@
 @property AudioDeviceID defaultInputDeviceID;
 @property AudioDeviceID defaultOutputDeviceID;
 
-- (void)getDeviceInfo:(AudioDeviceID)deviceID;
 - (AudioStreamBasicDescription)getDefaultStreamDescription;
 - (Float32)getDefaultOutputDeviceVolume;
 - (void)setDefaultOutputDeviceVolume:(Float32)newVolume;
 - (UInt32)getBufferSizes:(AudioDeviceID)outputDeviceID;
+
++ (NSString*)getDeviceName:(AudioDeviceID)deviceID withInput:(BOOL)isInput;
++ (UInt32)getSafteyOffset:(AudioDeviceID)deviceID withInput:(BOOL)isInput;
++ (UInt32)getBufferFrameSize:(AudioDeviceID)deviceID withInput:(BOOL)isInput;
++ (AudioStreamBasicDescription)getStreamFormat:(AudioDeviceID)deviceID withInput:(BOOL)isInput;
 
 @end
 

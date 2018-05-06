@@ -13,13 +13,15 @@
 @interface AudioDevice : NSObject
 
 @property AudioDeviceID deviceID;
+@property NSString * deviceName;
 @property BOOL isInput;
 @property UInt32 safteyOffset;
 @property UInt32 bufferFrameSize;
 @property AudioStreamBasicDescription streamFormat;
 
-- (id)initWithDeviceID:(AudioDeviceID)deviceID withIsInput:(BOOL)isInput;
+- (id)initWithDeviceID:(AudioDeviceID)deviceID withInput:(BOOL)isInput;
 - (void)updateFormat;
 
 @end
+
 #endif /* AudioDevice_h */

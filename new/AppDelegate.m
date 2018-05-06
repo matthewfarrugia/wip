@@ -8,6 +8,7 @@
 #import "AppDelegate.h"
 #import <Foundation/Foundation.h>
 #import <CoreAudio/CoreAudio.h>
+#import "Logger.h"
 #import "DeviceUtility.h"
 #import "AudioDevice.h"
 #import "AudioEngine.h"
@@ -21,14 +22,13 @@
     AudioDeviceID audioOutputDeviceID = audioDevicesUtility.defaultOutputDeviceID;
     AudioDeviceID audioInputDeviceID = audioDevicesUtility.defaultInputDeviceID;
     
-    AudioDevice * inputDevice = [[AudioDevice alloc] initWithDeviceID:audioInputDeviceID withIsInput:TRUE];
-    AudioDevice * outputDevice = [[AudioDevice alloc] initWithDeviceID:audioOutputDeviceID withIsInput:FALSE];
+    AudioDevice * inputDevice = [[AudioDevice alloc] initWithDeviceID:audioInputDeviceID withInput:TRUE];
+    AudioDevice * outputDevice = [[AudioDevice alloc] initWithDeviceID:audioOutputDeviceID withInput:FALSE];
     
     AudioEngine * kernel = [[AudioEngine alloc] init:inputDevice withOutputDevice:outputDevice];
 
     OSStatus result = [kernel startEngines];
-    
-    NSLog(@"%i", result);
+        
     //NSLog(@"Output volume: %f", currentOutputVol);
     //[audioDevices setDefaultOutputDeviceVolume:0.333];
     //currentOutputVol = [audioDevices getDefaultOutputDeviceVolume];

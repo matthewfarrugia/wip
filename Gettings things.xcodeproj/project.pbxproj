@@ -14,6 +14,7 @@
 		A1D3A3DB203A1F0B0033E105 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = A1D3A3D9203A1F0B0033E105 /* MainMenu.xib */; };
 		A1D3A3DE203A1F0B0033E105 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = A1D3A3DD203A1F0B0033E105 /* main.m */; };
 		A1D3A3E7203A1FB20033E105 /* DeviceUtility.m in Sources */ = {isa = PBXBuildFile; fileRef = A1D3A3E6203A1FB10033E105 /* DeviceUtility.m */; };
+		A1D66147209F8CAC0096C290 /* Logger.m in Sources */ = {isa = PBXBuildFile; fileRef = A1D66146209F8CAC0096C290 /* Logger.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -33,6 +34,8 @@
 		A1D3A3DF203A1F0B0033E105 /* new.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = new.entitlements; sourceTree = "<group>"; };
 		A1D3A3E5203A1FB10033E105 /* DeviceUtility.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DeviceUtility.h; sourceTree = "<group>"; };
 		A1D3A3E6203A1FB10033E105 /* DeviceUtility.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DeviceUtility.m; sourceTree = "<group>"; };
+		A1D66146209F8CAC0096C290 /* Logger.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Logger.m; sourceTree = "<group>"; };
+		A1D66148209F91990096C290 /* Logger.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Logger.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -67,6 +70,7 @@
 		A1D3A3D3203A1F0B0033E105 /* new */ = {
 			isa = PBXGroup;
 			children = (
+				A1D66143209F88BC0096C290 /* Utilities */,
 				A1D3A3D4203A1F0B0033E105 /* AppDelegate.h */,
 				A1D3A3D5203A1F0B0033E105 /* AppDelegate.m */,
 				A1D3A3E5203A1FB10033E105 /* DeviceUtility.h */,
@@ -82,6 +86,16 @@
 				A1D3A3DF203A1F0B0033E105 /* new.entitlements */,
 			);
 			path = new;
+			sourceTree = "<group>";
+		};
+		A1D66143209F88BC0096C290 /* Utilities */ = {
+			isa = PBXGroup;
+			children = (
+				A1D66148209F91990096C290 /* Logger.h */,
+				A1D66146209F8CAC0096C290 /* Logger.m */,
+			);
+			name = Utilities;
+			path = "New Group";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -110,7 +124,7 @@
 		A1D3A3C9203A1F0B0033E105 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0920;
+				LastUpgradeCheck = 0930;
 				ORGANIZATIONNAME = "Matthew Farrugia";
 				TargetAttributes = {
 					A1D3A3D0203A1F0B0033E105 = {
@@ -158,6 +172,7 @@
 				A1D3A3E7203A1FB20033E105 /* DeviceUtility.m in Sources */,
 				A1829AFE203A2C9400760348 /* AudioDevice.m in Sources */,
 				A1D3A3D6203A1F0B0033E105 /* AppDelegate.m in Sources */,
+				A1D66147209F8CAC0096C290 /* Logger.m in Sources */,
 				A184D77A20419D0A00A350D9 /* AudioEngine.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -190,6 +205,7 @@
 				CLANG_WARN_BOOL_CONVERSION = YES;
 				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_EMPTY_BODY = YES;
@@ -197,6 +213,7 @@
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
@@ -245,6 +262,7 @@
 				CLANG_WARN_BOOL_CONVERSION = YES;
 				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_EMPTY_BODY = YES;
@@ -252,6 +270,7 @@
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;

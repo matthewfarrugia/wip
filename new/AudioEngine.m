@@ -148,20 +148,14 @@ OSStatus InputIOProc(AudioDeviceID inDevice,
                      const AudioTimeStamp *inOutputTime,
                      void * inClientData)
 {
-    AudioBufferList * buff = (AudioBufferList *) inClientData;
-    //UInt32 chunks = sizeof(inInputData->mBuffers->mData)/inInputData->mBuffers->mDataByteSize;
-    for(UInt32 i=0; i<inInputData->mNumberBuffers; i++) {
-        //UInt32 bytesToCopy = inInputData->mBuffers[i].mDataByteSize;
-        //memcpy(buff->mData, inInputData->mBuffers[i].mData, bytesToCopy);
+    AudioBufferList * clientBuffer = (AudioBufferList *) inClientData;
+    
+    for (UInt32 i=0; i<inInputData->mNumberBuffers; i++) {
         float * input = inInputData->mBuffers[i].mData;
         float * output;
+
         output = input;
-        buff->mBuffers[i].mData = output;
-        //Float32 * input = (Float32 *) inInputData->mBuffers[i].mData;
-        //buff->mData = input;
-        //NSLog(@"INPUT: %f", *input);
-//            buff->mData = inInputData->mBuffers->mData;
-//            NSLog(@"%d", (int)buff->mData);
+        clientBuffer->mBuffers[i].mData = output;
     }
     return noErr;
 }
@@ -174,33 +168,20 @@ OSStatus OutputIOProc(AudioDeviceID inDevice,
                       const AudioTimeStamp *inOutputTime,
                       void *inClientData)
 {
-    float x0 = 0.0;
+    AudioBufferList * clientBuffer = (AudioBufferList *) inClientData;
     
-    AudioBufferList * buff = (AudioBufferList *) inClientData;
+    float x0 = 1.0f;
     
     for(UInt32 i = 0; i < outOutputData->mNumberBuffers; i++){
-        for(UInt32 channel = 0; channel < outOutputData->mBuffers->mNumberChannels; channel++) {
-            float * input = (float *) buff->mBuffers[i].mData;
-            float * output = (float *) outOutputData->mBuffers[i].mData + channel;
-            UInt32 outnchnls = outOutputData->mBuffers[i].mNumberChannels;
-            long framesize = outnchnls * sizeof(float);
-            //for(UInt32 x = 0; x < 16; x++){
-//            for (UInt32 frame = 0; frame < outOutputData->mBuffers[i].mDataByteSize; frame += framesize ){
-//                if (input == NULL) {
-//
-//                } else {
-//                    x0 = *input;
-//                }
-//
-//            *output = x0 * 1.0;
-//            }
-            NSLog(@"%lu", sizeof(*output));
-            memcpy(outOutputData->mBuffers[i].mData, buff->mBuffers[i].mData, buff->mBuffers->mDataByteSize);
-            //}
-            //NSLog(@"OUTPUT: %f", *output);
-            //UInt32 bytesToCopy = outOutputData->mBuffers[i].mDataByteSize;
-            //memcpy(outOutputData->mBuffers[i].mData, buff->mData, bytesToCopy);
+        for (UInt32 e = 0; e < (outOutputData->mBuffers->mDataByteSize / sizeof(float)); e++) {
+            for(UInt32 channel = 0; channel < outOutputData->mBuffers->mNumberChannels; channel++) {
+                float * input = (float *)clientBuffer->mBuffers[i].mData + e;
+                float * output = (float*)outOutputData->mBuffers[i].mData + e;
+
+                float i0 = *input;
+                *output = i0 * x0;
             }
+        }
     }
     return noErr;
 }

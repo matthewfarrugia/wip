@@ -22,8 +22,6 @@
 		A1829AFF203A2CA000760348 /* AudioDevice.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AudioDevice.h; sourceTree = "<group>"; };
 		A184D77820419CA700A350D9 /* AudioEngine.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AudioEngine.h; sourceTree = "<group>"; };
 		A184D77920419D0A00A350D9 /* AudioEngine.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AudioEngine.m; sourceTree = "<group>"; };
-		A184D77C2041AA2400A350D9 /* AudioTee.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = AudioTee.cpp; path = "../../../Downloads/WavTap-master/App/AudioTee.cpp"; sourceTree = "<group>"; };
-		A184D77D2041C6CC00A350D9 /* AppController.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; name = AppController.mm; path = "../../../Downloads/WavTap-master/App/AppController.mm"; sourceTree = "<group>"; };
 		A1D3A3D1203A1F0B0033E105 /* Gettings things.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Gettings things.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		A1D3A3D4203A1F0B0033E105 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		A1D3A3D5203A1F0B0033E105 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -54,8 +52,6 @@
 			children = (
 				A1D3A3D3203A1F0B0033E105 /* new */,
 				A1D3A3D2203A1F0B0033E105 /* Products */,
-				A184D77C2041AA2400A350D9 /* AudioTee.cpp */,
-				A184D77D2041C6CC00A350D9 /* AppController.mm */,
 			);
 			sourceTree = "<group>";
 		};

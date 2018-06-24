@@ -32,8 +32,8 @@
 		A1D3A3DF203A1F0B0033E105 /* new.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = new.entitlements; sourceTree = "<group>"; };
 		A1D3A3E5203A1FB10033E105 /* DeviceUtility.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DeviceUtility.h; sourceTree = "<group>"; };
 		A1D3A3E6203A1FB10033E105 /* DeviceUtility.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DeviceUtility.m; sourceTree = "<group>"; };
-		A1D66146209F8CAC0096C290 /* Logger.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Logger.m; sourceTree = "<group>"; };
-		A1D66148209F91990096C290 /* Logger.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Logger.h; sourceTree = "<group>"; };
+		A1D66146209F8CAC0096C290 /* Logger.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = Logger.m; path = new/Utilities/Logger.m; sourceTree = SOURCE_ROOT; };
+		A1D66148209F91990096C290 /* Logger.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = Logger.h; path = new/Utilities/Logger.h; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */

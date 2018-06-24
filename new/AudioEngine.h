@@ -15,7 +15,7 @@
 
 - (id)init:(AudioDevice*)inDevice withOutputDevice:(AudioDevice*)outDevice;
 - (OSStatus)startEngines;
-
+- (void)setGain:(float)gain;
 @end
 
 #endif /* AudioEngine_h */

@@ -23,4 +23,8 @@
     [self logString:[NSString stringWithFormat:@"audioDeviceSuccess: (%@)", status]];
 }
 
++ (void)logUIEvent:(NSString*)label withValue:(float)value {
+    [self logString:[NSString stringWithFormat:@"UIEvent: (%@): Value: %f", label, value]];
+}
+
 @end

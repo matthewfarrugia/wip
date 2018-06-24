@@ -9,6 +9,10 @@
 
 @interface AppDelegate : NSObject <NSApplicationDelegate>
 
+@property (readwrite, assign) IBOutlet NSSlider* slider;
+
+- (IBAction)sliderValueChanged:(id)sender;
+
 
 @end
 

@@ -20,6 +20,8 @@ UInt32 bytesPerPacket;
 UInt32 channelsPerFrame;
 UInt32 framesPerPacket;
 
+float mGain = 1.0;
+
 AudioBufferList * mWorkBuf;
 
 AudioDeviceIOProc mInputIOProc;
@@ -40,6 +42,9 @@ AudioDeviceIOProcID mOutputIOProcID;
     framesPerPacket = inputAudioDevice.streamFormat.mFramesPerPacket;
     
     return self;
+}
+- (void)setGain:(float)gain {
+    mGain = gain;
 }
 
 - (OSStatus)startEngines {
@@ -170,7 +175,7 @@ OSStatus OutputIOProc(AudioDeviceID inDevice,
 {
     AudioBufferList * clientBuffer = (AudioBufferList *) inClientData;
     
-    float x0 = 1.0f;
+    float x0 = mGain;
     
     for(UInt32 i = 0; i < outOutputData->mNumberBuffers; i++){
         for (UInt32 e = 0; e < (outOutputData->mBuffers->mDataByteSize / sizeof(float)); e++) {

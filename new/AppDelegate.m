@@ -12,8 +12,12 @@
 #import "DeviceUtility.h"
 #import "AudioDevice.h"
 #import "AudioEngine.h"
+#import "MainWindowViewController.h"
 
 @implementation AppDelegate
+
+@synthesize slider;
+AudioEngine * kernel;
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
 
@@ -25,15 +29,21 @@
     AudioDevice * inputDevice = [[AudioDevice alloc] initWithDeviceID:audioInputDeviceID withInput:TRUE];
     AudioDevice * outputDevice = [[AudioDevice alloc] initWithDeviceID:audioOutputDeviceID withInput:FALSE];
     
-    AudioEngine * kernel = [[AudioEngine alloc] init:inputDevice withOutputDevice:outputDevice];
+    kernel = [[AudioEngine alloc] init:inputDevice withOutputDevice:outputDevice];
 
     OSStatus result = [kernel startEngines];
+
         
     //NSLog(@"Output volume: %f", currentOutputVol);
     //[audioDevices setDefaultOutputDeviceVolume:0.333];
     //currentOutputVol = [audioDevices getDefaultOutputDeviceVolume];
     //NSLog(@"Output volume: %f", currentOutputVol);
     //[audioDevicesUtility startAudio:audioDeviceID withInputID:inputerAudioer];
+}
+
+- (IBAction)sliderValueChanged:(id)sender {
+    [Logger logUIEvent:@"Slider Value Changed" withValue:slider.floatValue];
+    [kernel setGain:slider.floatValue];
 }
 
 

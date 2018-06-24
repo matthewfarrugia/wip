@@ -16,6 +16,7 @@
 + (void)logAudioFailure:(NSString*)status withCode:(OSStatus*)result;
 + (void)logAudioSuccess:(NSString*)status;
 
++ (void)logUIEvent:(NSString*)label withValue:(float)value;
 
 @end
 
